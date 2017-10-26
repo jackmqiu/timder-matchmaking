@@ -1,0 +1,26 @@
+{
+  "name": "timder-matchmaking",
+  "version": "1.0.0",
+  "description": "Provide queue of users for swiping",
+  "main": "index.js",
+  "scripts": {
+    "server-dev": "nodemon server/index.jsx"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jackmqiu/timder-matchmaking.git"
+  },
+  "author": "jackmqiu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jackmqiu/timder-matchmaking/issues"
+  },
+  "homepage": "https://github.com/jackmqiu/timder-matchmaking#readme",
+  "dependencies": {
+    "axios": "^0.17.0",
+    "express": "^4.16.2",
+    "faker": "^4.1.0",
+    "nodemon": "^1.12.1",
+    "redis": "^2.8.0"
+  }
+}
