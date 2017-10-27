@@ -23,7 +23,7 @@ let getQueueInitial = (locationId, userId) => { //needs promise in call
   .then((res) => {
     console.log(`longQueue:user:${userId}`, `\n${res} users in set`);
     console.log(`longQueue:user:${userId}`, `0`, `match *`, `count ${config.queue_size}`);
-    return client.sscanAsync(`longQueue:user:${userId}`, `0`)//, `match *`)//, `count ${config.queue_size}`) //returns queue and sscan cursor
+    return client.sscanAsync(`longQueue:user:${userId}`, `0`)//, `match *`), `count ${config.queue_size}`) //returns queue and sscan cursor
   })
   // .then((res) => {
   //   return res;
