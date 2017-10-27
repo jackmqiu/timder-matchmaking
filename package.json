@@ -18,6 +18,7 @@
   "homepage": "https://github.com/jackmqiu/timder-matchmaking#readme",
   "dependencies": {
     "axios": "^0.17.0",
+    "bluebird": "^3.5.1",
     "express": "^4.16.2",
     "faker": "^4.1.0",
     "nodemon": "^1.12.1",

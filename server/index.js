@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
-const db = require('../db/index');
+const db = require('../db');
 const mysql = require('mysql');
 const redis = require('redis');
 
@@ -11,8 +11,8 @@ let app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
-app.get('/getQueue', (req, res) => {
-  
+app.get('/getQueue/:locationId/:userId', (req, res) => {
+
 })
 
 app.post('/swipe', (req, res) => {

@@ -1,2 +1,2 @@
-const config = require('./config.js');
+const config = require('../db/config.js');
 const redis = require('redis');

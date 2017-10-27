@@ -1,5 +1,5 @@
 const generator = require('./generator.js');
-const config = require('./config.js');
+const config = require('../db/config.js');
 
 const redis = require('redis');
 
@@ -15,7 +15,7 @@ let submitNewUser = (n) => {
     } else {
       console.log('Successful inject:', res, n);
       client.sadd(`users:location:${newUser[1]}`, `users:${n}`, () => {console.log(`users:location:${newUser[1]}`);});
-      client.sadd(`swipes:user:${n}`, 1, () => {console.log(`swipes:user:${n}`);}); //everyone swiped on user 1 at time of user creation
+      client.sadd(`swipes:user:${n}`, 'users:1', () => {console.log(`swipes:user:${n}`);}); //everyone swiped on user 1 at time of user creation
       if (n > 0) {
         submitNewUser(n - 1);
       }
