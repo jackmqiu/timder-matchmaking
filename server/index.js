@@ -10,9 +10,16 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.get('/getQueueInitial/:locationId/:userId', (req, res) => {
-  console.log('gettingQueueInitial');
-  db.getQueueInitial().then((cursor) => {
+  console.log('gettingQueueInitial', req.params);
+  db.getQueueInitial(req.params.locationId, req.params.userId, (err, cursor) => {
+
     res.status(200).send(cursor);
+  })
+  .then((cursor) => {
+    res.status(200).send(cursor);
+  })
+  .catch((err) => {
+    console.log(err);
   })
 })
 app.post('/getQueue/:locationId/:userId', (req, res) => {
