@@ -9,7 +9,7 @@ const client = redis.createClient(config.redis_port, config.redis_host);
 //const client = bluebird.promisifyAll(redis.createClient(config.redis_port, config.redis_host));
 
 
-let getQueueInitial = (locationId, userId, cb) => { //needs promise in call
+let getQueueInitial = (locationId, userId) => { //needs promise in call
   console.log('gettingQueue at db index', `longQueue:user:${userId}`, `users:location:${locationId}`);
   // client.sdiffstore(`longQueue:user:${userId}`, `users:location:${locationId}`, `swipes:user:${userId}`, (err, res) => {
   //   if (err) {
@@ -23,14 +23,7 @@ let getQueueInitial = (locationId, userId, cb) => { //needs promise in call
   .then((res) => {
     console.log(`longQueue:user:${userId}`, `\n${res} users in set`);
     console.log(`longQueue:user:${userId}`, `0`, `match *`, `count ${config.queue_size}`);
-    client.sscan(`longQueue:user:${userId}`, [`0`, `MATCH *`, `COUNT ${config.queue_size}`], (err, res) => {
-      if (err) {
-        console.log('err', err);
-      } else {
-        console.log(`longQueue:user:${userId}`, `\n${res} users in set`);
-        cb(null, res);
-      }
-    }); //returns queue and sscan cursor
+    return client.sscanAsync(`longQueue:user:${userId}`, `0`)//, `match *`)//, `count ${config.queue_size}`) //returns queue and sscan cursor
   })
   // .then((res) => {
   //   return res;
