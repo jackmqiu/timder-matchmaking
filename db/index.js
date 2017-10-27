@@ -8,8 +8,14 @@ bluebird.promisifyAll(redis.Multi.prototype);
 const client = redis.createClient(config.redis_port, config.redis_host);
 //const client = bluebird.promisifyAll(redis.createClient(config.redis_port, config.redis_host));
 
+let getQueue = (locationId, userId) => {
+  //look for routes
 
-let getQueueInitial = (locationId, userId) => { //needs promise in call
+  addQueueInitial
+  client.lpush()
+}
+
+let addQueueInitial = (locationId, userId) => { //needs promise in call
   console.log('gettingQueue at db index', `longQueue:user:${userId}`, `users:location:${locationId}`);
   // client.sdiffstore(`longQueue:user:${userId}`, `users:location:${locationId}`, `swipes:user:${userId}`, (err, res) => {
   //   if (err) {
@@ -30,7 +36,7 @@ let getQueueInitial = (locationId, userId) => { //needs promise in call
   // });
 }
 
-let getQueue = (locationId, userId, cursor) => {
+let addQueue = (locationId, userId, cursor) => {
   return client.sscanAsync(`swipes:user:${userId}`, cursor, 'match *', `count ${config.queue_size}`) //returns queue and sscan cursor
   .then((res) => {
     return res;
@@ -38,6 +44,7 @@ let getQueue = (locationId, userId, cursor) => {
 }
 
 module.exports = {
-  getQueueInitial,
-  getQueue
+  addQueueInitial,
+  getQueue,
+  client
 }

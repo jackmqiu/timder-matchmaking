@@ -1,26 +1,28 @@
 const generator = require('./generator.js');
-const config = require('../db/config.js');
-
+const db = require('../db');
 const redis = require('redis');
-
-var client = redis.createClient(config.redis_port, config.redis_host);
 
 let submitNewUser = (n) => {
 
   let newUser = generator.generateNewUserArray();
-  client.hmset(`users:${n}`, newUser,
-  (err, res) => {
-    if (err) {
-      console.error('Insert error:', err);
-    } else {
-      console.log('Successful inject:', res, n);
-      client.sadd(`users:location:${newUser[1]}`, `users:${n}`, () => {console.log(`users:location:${newUser[1]}`);});
-      client.sadd(`swipes:user:${n}`, 'users:1', () => {console.log(`swipes:user:${n}`);}); //everyone swiped on user 1 at time of user creation
-      if (n > 0) {
-        submitNewUser(n - 1);
-      }
+  db.client.hmsetAsync(`users:${n}`, newUser)
+  .then((res) => {
+    console.log('Successful inject:', res, n);
+    db.client.saddAsync(`users:location:${newUser[1]}`, `users:${n}`)
+    .then((res) => {
+      console.log(`users:location:${newUser[1]}`);
+    })
+    db.client.saddAsync(`swipes:user:${n}`, 'users:1') //everyone swiped on user 1 at time of user creation
+    .then((res) => {
+      console.log(`swipes:user:${n}`);
+    })
+    if (n > 0) {
+      submitNewUser(n - 1);
     }
-  });
+
+  })
+
+
 
 }
 

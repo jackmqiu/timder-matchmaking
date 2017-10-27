@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const db = require('../db');
 const redis = require('redis');
-const bluebird = require('bluebird');
+
 let app = express();
 
 //app.use(express.static(path.join(__dirname, '../client/dist/')));
@@ -11,10 +11,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.get('/getQueueInitial/:locationId/:userId', (req, res) => {
   console.log('gettingQueueInitial', req.params);
-  db.getQueueInitial(req.params.locationId, req.params.userId, (err, cursor) => {
-
-    res.status(200).send(cursor);
-  })
+  db.addQueueInitial(req.params.locationId, req.params.userId)
   .then((cursor) => {
     res.status(200).send(cursor);
   })
