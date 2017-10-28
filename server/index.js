@@ -9,10 +9,11 @@ let app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
-app.get('/getQueueInitial/:locationId/:userId', (req, res) => {
+app.get('/getQueue/:locationId/:userId', (req, res) => {
   console.log('gettingQueueInitial', req.params);
   db.fillAndRetrieveQueueList(req.params.locationId, req.params.userId)
   .then((cursor) => {
+    db.deleteQueueList(req.params.userId);
     console.log('promise of app.get', cursor);
     res.status(200).send(cursor);
   })

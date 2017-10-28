@@ -43,6 +43,10 @@ let addQueue = (locationId, userId) => { //needs promise in call
   })
 }
 
+let deleteQueueList = (userId) => {
+  return client.del(`shortQueue:user:${userId}`);
+}
+
 let fillAndRetrieveQueueList = (locationId, userId, cursor) => {
   return addQueue(locationId, userId, cursor)
   .then((res) => {
@@ -57,5 +61,6 @@ module.exports = {
   addQueue,
   client,
   scanLongQueue,
-  fillAndRetrieveQueueList
+  fillAndRetrieveQueueList,
+  deleteQueueList
 }
