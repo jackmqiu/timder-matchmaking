@@ -19,32 +19,14 @@ const basePreference = {
 };
 
 
-let scanLongQueue = (locationId, userId, cursor) => {
-  return client.sscanAsync(`longQueue:user:${userId}`, `0`, `MATCH`, `*`, `count`, config.queue_size) //returns queue and sscan cursor
+let scanLongQueue = (locationId, userId, cursor = 0) => {
+  return client.sscanAsync(`longQueue:user:${userId}`, cursor, `MATCH`, `*`, `count`, config.queue_size) //returns queue and sscan cursor
 }
 
-let fillQueueList = (locationId, userId, cursor, limit) => {
-  addQueue(locationId, userId, cursor)
+let getQueueInitial = (locationId, userId) => {
+  return client.sdiffstoreAsync(`longQueue:user:${userId}`, `users:location:${locationId}`, `swipes:user:${userId}`) //make list of all users current user hasn't swiped on in given location
   .then((res) => {
-    client.lpushAsync(`shortQueue:user:${userId}`, res[1])
-    .then((res) => {
-      if (limit < 0) {
-        return 1;
-      } else {
-        console.log('filling Queue', limit);
-        return fillQueueList(locationId, userId, res[0], limit - 10);
-      }
-    })
-  })
-}
-
-let getQueue = (locationId, userId) => {
-
-  //look for weights
-  fillQueueList(locationId, userId, 0, 100)
-  .then((res) => {
-    console.log('queue filled', `shortQueue:user:${userId}`);
-
+    return scanLongQueue(LocationId, userId);
   })
 }
 
@@ -56,22 +38,24 @@ let addQueue = (locationId, userId) => { //needs promise in call
     if (res) {
       return scanLongQueue(locationId, userId);
     } else {
-      return client.sdiffstoreAsync(`longQueue:user:${userId}`, `users:location:${locationId}`, `swipes:user:${userId}`); //make list of all users current user hasn't swiped on in given location
+      return getQueueInitial(locationId, userId);
     }
   })
-  .then((res) => {
-    console.log(`longQueue:user:${userId}`, `\n${res} users in set`);
-    console.log(`longQueue:user:${userId}`, `0`);
-    return scanLongQueue(locationId, userId);
-  })
-
 }
 
-
+let fillAndRetrieveQueueList = (locationId, userId, cursor) => {
+  return addQueue(locationId, userId, cursor)
+  .then((res) => {
+    return client.lpushAsync(`shortQueue:user:${userId}`, res[1])
+  })
+  .then((res) => {
+    return client.lrangeAsync(`shortQueue:user:${userId}`, 0, -1)
+  })
+}
 
 module.exports = {
   addQueue,
-  getQueue,
   client,
-  scanLongQueue
+  scanLongQueue,
+  fillAndRetrieveQueueList
 }
