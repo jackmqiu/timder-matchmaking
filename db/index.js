@@ -18,12 +18,34 @@ const basePreference = {
   }
 };
 
+
+let scanLongQueue = (locationId, userId, cursor) => {
+  return client.sscanAsync(`longQueue:user:${userId}`, `0`, `MATCH`, `*`, `count`, config.queue_size) //returns queue and sscan cursor
+}
+
+let fillQueueList = (locationId, userId, cursor, limit) => {
+  addQueue(locationId, userId, cursor)
+  .then((res) => {
+    client.lpushAsync(`shortQueue:user:${userId}`, res[1])
+    .then((res) => {
+      if (limit < 0) {
+        return 1;
+      } else {
+        console.log('filling Queue', limit);
+        return fillQueueList(locationId, userId, res[0], limit - 10);
+      }
+    })
+  })
+}
+
 let getQueue = (locationId, userId) => {
 
   //look for weights
-  addQueueInitial()
-  .then()
-  client.lpush()
+  fillQueueList(locationId, userId, 0, 100)
+  .then((res) => {
+    console.log('queue filled', `shortQueue:user:${userId}`);
+
+  })
 }
 
 let addQueue = (locationId, userId) => { //needs promise in call
@@ -32,7 +54,7 @@ let addQueue = (locationId, userId) => { //needs promise in call
   .then((res) => {
     console.log('exists', res)
     if (res) {
-      return scanQueue(locationId, userId);
+      return scanLongQueue(locationId, userId);
     } else {
       return client.sdiffstoreAsync(`longQueue:user:${userId}`, `users:location:${locationId}`, `swipes:user:${userId}`); //make list of all users current user hasn't swiped on in given location
     }
@@ -40,20 +62,16 @@ let addQueue = (locationId, userId) => { //needs promise in call
   .then((res) => {
     console.log(`longQueue:user:${userId}`, `\n${res} users in set`);
     console.log(`longQueue:user:${userId}`, `0`);
-    return scanQueue(locationId, userId);
+    return scanLongQueue(locationId, userId);
   })
 
 }
 
-let scanQueue = (locationId, userId, cursor) => {
-  return client.sscanAsync(`longQueue:user:${userId}`, `0`);//, `match *`), `count ${config.queue_size}`) //returns queue and sscan cursor
-  // .then((res) => {
-  //   return res;
-  // });
-}
+
 
 module.exports = {
   addQueue,
   getQueue,
-  client
+  client,
+  scanLongQueue
 }

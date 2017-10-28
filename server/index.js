@@ -11,7 +11,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.get('/getQueueInitial/:locationId/:userId', (req, res) => {
   console.log('gettingQueueInitial', req.params);
-  db.addQueue(req.params.locationId, req.params.userId)
+  db.scanLongQueue(req.params.locationId, req.params.userId)
   .then((cursor) => {
     console.log('promise of app.get', cursor);
     res.status(200).send(cursor);
