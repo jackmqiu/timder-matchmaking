@@ -6,45 +6,54 @@ bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
 
 const client = redis.createClient(config.redis_port, config.redis_host);
-//const client = bluebird.promisifyAll(redis.createClient(config.redis_port, config.redis_host));
+
+const basePreference = {
+  weight_id: 9991214,
+  user_id: 9991214,
+  photo_count_weight: {
+    0: 0.25,
+    1: 0.5,
+    2: 0.75,
+    3: 0.25
+  }
+};
 
 let getQueue = (locationId, userId) => {
-  //look for routes
 
-  addQueueInitial
+  //look for weights
+  addQueueInitial()
+  .then()
   client.lpush()
 }
 
-let addQueueInitial = (locationId, userId) => { //needs promise in call
+let addQueue = (locationId, userId) => { //needs promise in call
   console.log('gettingQueue at db index', `longQueue:user:${userId}`, `users:location:${locationId}`);
-  // client.sdiffstore(`longQueue:user:${userId}`, `users:location:${locationId}`, `swipes:user:${userId}`, (err, res) => {
-  //   if (err) {
-  //     console.log('err', err);
-  //   } else {
-  //     console.log(`longQueue:user:${userId}`, `\n${res} users in set`);
-  //     //return client.sscanAsync(`swipes:user:${userId}`, 0, 'match *', `count ${config.queue_size}`);
-  //   }
-  // })
-  return client.sdiffstoreAsync(`longQueue:user:${userId}`, `users:location:${locationId}`, `swipes:user:${userId}`) //make list of all users current user hasn't swiped on in given location
+  return client.existsAsync(`longQueue:user:${userId}`)
+  .then((res) => {
+    console.log('exists', res)
+    if (res) {
+      return scanQueue(locationId, userId);
+    } else {
+      return client.sdiffstoreAsync(`longQueue:user:${userId}`, `users:location:${locationId}`, `swipes:user:${userId}`); //make list of all users current user hasn't swiped on in given location
+    }
+  })
   .then((res) => {
     console.log(`longQueue:user:${userId}`, `\n${res} users in set`);
-    console.log(`longQueue:user:${userId}`, `0`, `match *`, `count ${config.queue_size}`);
-    return client.sscanAsync(`longQueue:user:${userId}`, `0`)//, `match *`), `count ${config.queue_size}`) //returns queue and sscan cursor
+    console.log(`longQueue:user:${userId}`, `0`);
+    return scanQueue(locationId, userId);
   })
+
+}
+
+let scanQueue = (locationId, userId, cursor) => {
+  return client.sscanAsync(`longQueue:user:${userId}`, `0`);//, `match *`), `count ${config.queue_size}`) //returns queue and sscan cursor
   // .then((res) => {
   //   return res;
   // });
 }
 
-let addQueue = (locationId, userId, cursor) => {
-  return client.sscanAsync(`swipes:user:${userId}`, cursor, 'match *', `count ${config.queue_size}`) //returns queue and sscan cursor
-  .then((res) => {
-    return res;
-  });
-}
-
 module.exports = {
-  addQueueInitial,
+  addQueue,
   getQueue,
   client
 }
