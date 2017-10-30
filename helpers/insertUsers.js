@@ -5,14 +5,14 @@ const redis = require('redis');
 let submitNewUser = (n) => {
 
   let newUser = generator.generateNewUserArray();
-  db.client.hmsetAsync(`users:${n}`, newUser)
+  db.client.hmsetAsync(`user:${n}`, newUser)
   .then((res) => {
     console.log('Successful inject:', res, n);
-    db.client.saddAsync(`users:location:${newUser[1]}`, `users:${n}`)
+    db.client.saddAsync(`users:location:${newUser[1]}`, `user:${n}`)
     .then((res) => {
       console.log(`users:location:${newUser[1]}`);
     })
-    db.client.saddAsync(`swipes:user:${n}`, 'users:1') //everyone swiped on user 1 at time of user creation
+    db.client.saddAsync(`swipes:user:${n}`, 'user:1') //everyone swiped on user 1 at time of user creation
     .then((res) => {
       console.log(`swipes:user:${n}`);
     })

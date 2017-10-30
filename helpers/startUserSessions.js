@@ -1,7 +1,7 @@
 
 
-//randomly generate users who log on
-
+//randomly generate users
+//Users asynchronously
 //loop through users
 
 //request queue

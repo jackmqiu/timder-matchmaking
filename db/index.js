@@ -18,7 +18,7 @@ const basePreference = {
   }
 };
 
-
+//Set manipulation
 let scanLongQueue = (locationId, userId, cursor = 0) => {
   return client.sscanAsync(`longQueue:user:${userId}`, cursor, `MATCH`, `*`, `count`, config.queue_size) //returns queue and sscan cursor
 }
@@ -30,7 +30,7 @@ let getQueueInitial = (locationId, userId) => {
   })
 }
 
-let addQueue = (locationId, userId) => { //needs promise in call
+let addQueue = (locationId, userId, cursor) => { //needs promise in call
   console.log('gettingQueue at db index', `longQueue:user:${userId}`, `users:location:${locationId}`);
   return client.existsAsync(`longQueue:user:${userId}`)
   .then((res) => {
@@ -43,6 +43,7 @@ let addQueue = (locationId, userId) => { //needs promise in call
   })
 }
 
+//List manipulation
 let deleteQueueList = (userId) => {
   return client.del(`shortQueue:user:${userId}`);
 }
@@ -57,10 +58,22 @@ let fillAndRetrieveQueueList = (locationId, userId, cursor) => {
   })
 }
 
+let postSwipes = (userId, userId2, direction) => {
+  if (direction) {
+    return client.rpushAsync(`shortQueue:user:${userId}`, `user:${userId2}`)
+    .then((res) => {
+      return client.saddAsync(`swipes:user:${userId}`, `user:${userId2}`)
+    })
+  } else {
+    return client.saddAsync(`swipes:user:${userId}`, `user:${userId2}`)
+  }
+}
+
 module.exports = {
   addQueue,
   client,
   scanLongQueue,
   fillAndRetrieveQueueList,
-  deleteQueueList
+  deleteQueueList,
+  postSwipes
 }

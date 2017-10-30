@@ -21,17 +21,15 @@ app.get('/getQueue/:locationId/:userId', (req, res) => {
     console.log(err);
   })
 })
-app.post('/getQueue/:locationId/:userId', (req, res) => {
-  console.log('gettingQueue');
-  db.getQueue().then((res) => {
-    res.status(200).send(cursor);
+
+app.post('/swipe/:userId/:userId2/:direction', (req, res) => {
+  db.postSwipes(req.params.userId, req.params.userId2, req.params.direction)
+  .then((cursor) => {
+    res.status(200).send('successful');
   })
-});
-
-
-
-app.post('/swipe', (req, res) => {
-
+  .catch((err) => {
+    console.log(err);
+  })
 })
 
 const PORT = process.env.PORT || 3000;
