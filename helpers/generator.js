@@ -59,8 +59,10 @@ let generateLocation = () => {
    }
 }
 
-let generateNewUserArray = () => {
+let generateNewUserArray = (userId) => {
   let newUser = [];
+  newUser.push('userId');
+  newUser.push(userId);
   newUser.push('location');
   newUser.push(generateLocation());
   newUser.push('preferenceFor0Photos');
@@ -84,5 +86,6 @@ let generateNewUserArray = () => {
 }
 
 module.exports = {
-  generateNewUserArray
+  generateNewUserArray,
+  generateLocation
 }

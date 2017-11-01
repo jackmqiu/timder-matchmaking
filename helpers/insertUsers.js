@@ -4,7 +4,7 @@ const redis = require('redis');
 
 let submitNewUser = (n) => {
 
-  let newUser = generator.generateNewUserArray();
+  let newUser = generator.generateNewUserArray(n);
   db.client.hmsetAsync(`user:${n}`, newUser)
   .then((res) => {
     console.log('Successful inject:', res, n);
