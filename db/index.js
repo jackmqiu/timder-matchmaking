@@ -30,7 +30,7 @@ let getQueueInitial = (locationId, userId) => {
   })
 }
 
-let addQueue = (locationId, userId, cursor) => { //needs promise in call
+let addQueue = (locationId, userId) => { //needs promise in call
   console.log('gettingQueue at db index', `longQueue:user:${userId}`, `users:location:${locationId}`);
   return client.existsAsync(`longQueue:user:${userId}`)
   .then((res) => {
@@ -48,8 +48,8 @@ let deleteQueueList = (userId) => {
   return client.del(`shortQueue:user:${userId}`);
 }
 
-let fillAndRetrieveQueueList = (locationId, userId, cursor) => {
-  return addQueue(locationId, userId, cursor)
+let fillAndRetrieveQueueList = (locationId, userId) => {
+  return addQueue(locationId, userId)
   .then((res) => {
     return client.lpushAsync(`shortQueue:user:${userId}`, res[1])
   })
