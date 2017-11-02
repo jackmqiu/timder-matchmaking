@@ -8,7 +8,7 @@ let submitNewUser = (n) => {
   db.client.hmsetAsync(`user:${n}`, newUser)
   .then((res) => {
     console.log('Successful inject:', res, n);
-    db.client.saddAsync(`users:location:${newUser[1]}`, `user:${n}`)
+    db.client.saddAsync(`users:location:${newUser[3]}`, `user:${n}`)
     .then((res) => {
       console.log(`users:location:${newUser[1]}`);
     })

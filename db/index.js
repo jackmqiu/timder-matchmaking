@@ -20,13 +20,19 @@ const basePreference = {
 
 //Set manipulation
 let scanLongQueue = (locationId, userId, cursor = 0) => {
+  console.log('arguments at scanLongQueue: ', locationId, userId);
   return client.sscanAsync(`longQueue:user:${userId}`, cursor, `MATCH`, `*`, `count`, config.queue_size) //returns queue and sscan cursor
 }
 
 let getQueueInitial = (locationId, userId) => {
+  console.log('arguments at getQueueInitial for sdiffstoreAsync: ', locationId, userId);
   return client.sdiffstoreAsync(`longQueue:user:${userId}`, `users:location:${locationId}`, `swipes:user:${userId}`) //make list of all users current user hasn't swiped on in given location
   .then((res) => {
-    return scanLongQueue(LocationId, userId);
+    console.log('response of sdiffstoreAsync', res);
+    return scanLongQueue(locationId, userId);
+  })
+  .catch((err) => {
+    console.log('err at getQueueInitial db', err);
   })
 }
 
@@ -40,6 +46,9 @@ let addQueue = (locationId, userId) => { //needs promise in call
     } else {
       return getQueueInitial(locationId, userId);
     }
+  })
+  .catch((err) => {
+    console.log('err at addQueue db', err);
   })
 }
 
@@ -56,6 +65,9 @@ let fillAndRetrieveQueueList = (locationId, userId) => {
   .then((res) => {
     return client.lrangeAsync(`shortQueue:user:${userId}`, 0, -1)
   })
+  .catch((err) => {
+    console.log('err at fillAndRetrieveQueueList db', err);
+  })
 }
 
 let postSwipes = (userId, userId2, direction) => {
@@ -64,9 +76,16 @@ let postSwipes = (userId, userId2, direction) => {
     .then((res) => {
       return client.saddAsync(`swipes:user:${userId}`, `user:${userId2}`)
     })
+    .catch((err) => {
+      console.log('err at postSwipes db', err);
+    })
   } else {
     return client.saddAsync(`swipes:user:${userId}`, `user:${userId2}`)
   }
+}
+
+let getUserProfile = (userString) => {
+  return client.hgetallAsync(userString)
 }
 
 module.exports = {
@@ -75,5 +94,6 @@ module.exports = {
   scanLongQueue,
   fillAndRetrieveQueueList,
   deleteQueueList,
-  postSwipes
+  postSwipes,
+  getUserProfile
 }

@@ -18,7 +18,16 @@ app.get('/getQueue/:locationId/:userId', (req, res) => {
     res.status(200).send(cursor);
   })
   .catch((err) => {
-    console.log(err);
+    console.log('err at getQueue server', err);
+  })
+})
+
+app.get('/getUser/:userString', (req, res) => {
+  console.log('getting User', req.params.userString);
+  db.getUserProfile(req.params.userString)
+  .then((userProfile) => {
+    console.log('SERVER/INDEX.JS, GETUSERPROFILE.THEN userProfile', userProfile);
+    res.status(200).send(userProfile);
   })
 })
 
@@ -28,7 +37,7 @@ app.post('/swipe/:userId/:userId2/:direction', (req, res) => {
     res.status(200).send('successful');
   })
   .catch((err) => {
-    console.log(err);
+    console.log('err at swipe server', err);
   })
 })
 
