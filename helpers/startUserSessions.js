@@ -28,7 +28,7 @@ let swipeCity = (nPerBatch, nBatches, timePerBatch) => {
 }
 
 let getUserProf = (userId) => {
-  console.log('userId[0] at getUserProf', userId[0]);
+  //console.log('userId[0] at getUserProf', userId[0]);
   if (userId[0] === 'u') {
     return axios.get(`${apiURL}/getUser/${userId}`)
   } else {
@@ -51,10 +51,10 @@ let conductSwipes = (queue, userProfile) => {
   for (var i = 0; i < queue.length; i++) {
     getUserProf(queue[i])
     .then((swipeProfile) => {
-      if (Math.random() < userProfile[`preferenceFor${swipeProfile['photoCount']}Photos`]) {
-        sendSwipes(1, userProfile['userId'], swipeProfile['userId']);
+      if (Math.random() < userProfile[`preferenceFor${swipeProfile.data['photoCount']}Photos`]) {
+        sendSwipes(1, userProfile['userId'], swipeProfile.data['userId']);
       } else {
-        sendSwipes(0, userProfile['userId'], swipeProfile['userId']);
+        sendSwipes(0, userProfile['userId'], swipeProfile.data['userId']);
       }
     })
   }

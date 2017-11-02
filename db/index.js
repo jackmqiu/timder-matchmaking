@@ -72,7 +72,7 @@ let fillAndRetrieveQueueList = (locationId, userId) => {
 
 let postSwipes = (userId, userId2, direction) => {
   if (direction) {
-    return client.rpushAsync(`shortQueue:user:${userId}`, `user:${userId2}`)
+    return client.rpushAsync(`shortQueue:user:${userId2}`, `user:${userId}`)
     .then((res) => {
       return client.saddAsync(`swipes:user:${userId}`, `user:${userId2}`)
     })

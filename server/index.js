@@ -32,6 +32,7 @@ app.get('/getUser/:userString', (req, res) => {
 })
 
 app.post('/swipe/:userId/:userId2/:direction', (req, res) => {
+  console.log('swipePosting received at server', req.params);
   db.postSwipes(req.params.userId, req.params.userId2, req.params.direction)
   .then((cursor) => {
     res.status(200).send('successful');
