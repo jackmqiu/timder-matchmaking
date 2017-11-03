@@ -58,14 +58,16 @@ let sendSwipes = (direction, swipingUser, swipedUser) => {
 
 let conductSwipes = (queue, userProfile) => {
   for (var i = 0; i < queue.length; i++) {
-    getUserProf(queue[i])
-    .then((swipeProfile) => {
-      if (Math.random() < userProfile[`preferenceFor${swipeProfile.data['photoCount']}Photos`]) {
-        sendSwipes(1, userProfile['userId'], swipeProfile.data['userId']);
-      } else {
-        sendSwipes(0, userProfile['userId'], swipeProfile.data['userId']);
-      }
-    })
+    if (queue[i][5] !== 'u') {
+      getUserProf(queue[i])
+      .then((swipeProfile) => {
+        if (Math.random() < userProfile[`preferenceFor${swipeProfile.data['photoCount']}Photos`]) {
+          sendSwipes(1, userProfile['userId'], swipeProfile.data['userId']);
+        } else {
+          sendSwipes(0, userProfile['userId'], swipeProfile.data['userId']);
+        }
+      })
+    }
   }
 }
 
