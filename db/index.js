@@ -19,9 +19,9 @@ const basePreference = {
 };
 
 //Set manipulation
-let scanLongQueue = (locationId, userId, cursor = 0) => {
+let scanLongQueue = (locationId, userId) => {
   console.log('arguments at scanLongQueue: ', locationId, userId);
-  return client.sscanAsync(`longQueue:user:${userId}`, cursor, `MATCH`, `*`, `count`, config.queue_size) //returns queue and sscan cursor
+  return client.srandmemberAsync(`longQueue:user:${userId}`, config.queue_size) //returns queue and sscan cursor
 }
 
 let getQueueInitial = (locationId, userId) => {

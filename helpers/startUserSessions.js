@@ -8,10 +8,18 @@ const apiURL = 'http://localhost:3000';
 //request queue
 //give each an arbitrary setTimeout for when to logon
 
-let swipeCity = (nPerBatch, nBatches, timePerBatch) => {
+let swipeCity = (nPerBatch, timePerBatch, totalUsers, nBatches) => {
+  for (var i = 0; i < nBatches; i++) {
+    setTimeout(() => {
+      swipeBatch(nPerBatch, timePerBatch, totalUsers);
+    }, timePerBatch * i);
+  }
+}
+
+let swipeBatch = (nPerBatch, timePerBatch, totalUsers) => {
   for (var i = 0; i < nPerBatch; i++) {
     setTimeout(() => {
-      getUserProf(10000000 - Math.floor(Math.random() * 1000))
+      getUserProf(totalUsers - Math.floor(Math.random() * nPerBatch))
       .then((res) => {
         console.log('userProfile at startUserSessions, promise of getUserProf', res.data);
         getQueue(res.data)
@@ -23,8 +31,9 @@ let swipeCity = (nPerBatch, nBatches, timePerBatch) => {
       .catch((err) => {
         console.log('err at swipeCity', err);
       })
-    }, Math.floor(Math.random() * 60000))
+    }, Math.floor(Math.random() * timePerBatch))
   }
+
 }
 
 let getUserProf = (userId) => {
@@ -60,4 +69,4 @@ let conductSwipes = (queue, userProfile) => {
   }
 }
 
-swipeCity(100, 10, 10);
+swipeCity(100, 60000, 10000000, 10);
