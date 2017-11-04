@@ -18,6 +18,9 @@ const basePreference = {
   }
 };
 
+let getDatabaseInfo = () => {
+  return client.infoAsync()
+}
 //Set manipulation
 let scanLongQueue = (locationId, userId) => {
   console.log('arguments at scanLongQueue: ', locationId, userId);
@@ -81,11 +84,7 @@ let fillAndRetrieveQueueList = (locationId, userId) => {
 let postSwipes = (userId, userId2, direction, match) => { //add match logic
   if (direction) {
     if (match === 1) {
-      console.log('MATCHED BBBBBBBBBBBBBBB');
-      console.log('MATCHED BBBBBBBBBBBBBBB');
-      console.log('MATCHED BBBBBBBBBBBBBBB');
-      console.log('MATCHED BBBBBBBBBBBBBBB');
-      console.log('MATCHED BBBBBBBBBBBBBBB');
+
       client.rpushAsync(`matches:user:${userId}`, `user:${userId2}`) //add matches to both users
       client.rpushAsync(`matches:user:${userId2}`, `user:${userId}`)
       return client.saddAsync(`swipes:user:${userId}`, `user:${userId2}`)
@@ -116,5 +115,6 @@ module.exports = {
   deleteMatchQueue,
   postSwipes,
   getUserProfile,
-  retrieveMatchList
+  retrieveMatchList,
+  getDatabaseInfo
 }

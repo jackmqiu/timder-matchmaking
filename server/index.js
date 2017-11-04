@@ -31,6 +31,12 @@ app.get('/getQueue/:locationId/:userId', (req, res) => {
   })
 });
 
+app.get('/getDatabaseInfo', (req, res) => {
+  db.getDatabaseInfo()
+  .then((info) => {
+    console.log('databaseInfo', info);
+  })
+})
 app.get('/getUser/:userString', (req, res) => {
   console.log('getting User', req.params.userString);
   db.getUserProfile(req.params.userString)
