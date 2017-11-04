@@ -78,15 +78,26 @@ let fillAndRetrieveQueueList = (locationId, userId) => {
   })
 }
 
-let postSwipes = (userId, userId2, direction) => {
+let postSwipes = (userId, userId2, direction, match) => { //add match logic
   if (direction) {
-    return client.rpushAsync(`matchQueue:user:${userId2}`, `user:${userId}`)
-    .then((res) => {
+    if (match === 1) {
+      console.log('MATCHED BBBBBBBBBBBBBBB');
+      console.log('MATCHED BBBBBBBBBBBBBBB');
+      console.log('MATCHED BBBBBBBBBBBBBBB');
+      console.log('MATCHED BBBBBBBBBBBBBBB');
+      console.log('MATCHED BBBBBBBBBBBBBBB');
+      client.rpushAsync(`matches:user:${userId}`, `user:${userId2}`) //add matches to both users
+      client.rpushAsync(`matches:user:${userId2}`, `user:${userId}`)
       return client.saddAsync(`swipes:user:${userId}`, `user:${userId2}`)
-    })
-    .catch((err) => {
-      console.log('err at postSwipes db', err);
-    })
+    } else {
+      return client.rpushAsync(`matchQueue:user:${userId2}`, `user:${userId}`)
+      .then((res) => {
+        return client.saddAsync(`swipes:user:${userId}`, `user:${userId2}`)
+      })
+      .catch((err) => {
+        console.log('err at postSwipes db', err);
+      })
+    }
   } else {
     return client.saddAsync(`swipes:user:${userId}`, `user:${userId2}`)
   }

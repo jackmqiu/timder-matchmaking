@@ -25,12 +25,12 @@ let swipeBatch = (nPerBatch, timePerBatch, totalUsers) => {
         getQueue(res.data)
         .then((queue) => {
           console.log('queue at swipeCity before conductSwipes', queue.data, res.data);
-          conductSwipes(queue.data, res.data)
+          conductSwipes(queue.data, res.data, false)
         })
         getMatchQueue(res.data)
         .then((matchQueue) => {
           console.log('matchQueue at swipeCity', matchQueue.data, res.data);
-          conductSwipes(matchQueue.data, res.data)
+          conductSwipes(matchQueue.data, res.data, true)
         })
       })
       .catch((err) => {
@@ -61,19 +61,23 @@ let getMatchQueue = (userProfile) => {
   return axios.get(`${apiURL}/getMatchQueue/${userProfile['userId']}`)
 }
 
-let sendSwipes = (direction, swipingUser, swipedUser) => {
-  return axios.post(`${apiURL}/swipe/${swipingUser}/${swipedUser}/${direction}`)
+let sendSwipes = (direction, swipingUser, swipedUser, match) => {
+  return axios.post(`${apiURL}/swipe/${swipingUser}/${swipedUser}/${direction}/${match}`)
 }
 
-let conductSwipes = (queue, userProfile) => {
+let conductSwipes = (queue, userProfile, potentialMatches) => {
   for (var i = 0; i < queue.length; i++) {
     if (queue[i][5] !== 'u') {
       getUserProf(queue[i])
       .then((swipeProfile) => {
         if (Math.random() < userProfile[`preferenceFor${swipeProfile.data['photoCount']}Photos`]) {
-          sendSwipes(1, userProfile['userId'], swipeProfile.data['userId']);
+          if (potentialMatches) {
+            sendSwipes(1, userProfile['userId'], swipeProfile.data['userId'], 1);
+          } else {
+            sendSwipes(1, userProfile['userId'], swipeProfile.data['userId'], 0);
+          }
         } else {
-          sendSwipes(0, userProfile['userId'], swipeProfile.data['userId']);
+          sendSwipes(0, userProfile['userId'], swipeProfile.data['userId'], 0);
         }
       })
     }
