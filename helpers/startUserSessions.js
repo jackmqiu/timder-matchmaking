@@ -27,6 +27,11 @@ let swipeBatch = (nPerBatch, timePerBatch, totalUsers) => {
           console.log('queue at swipeCity before conductSwipes', queue.data, res.data);
           conductSwipes(queue.data, res.data)
         })
+        getMatchQueue(res.data)
+        .then((matchQueue) => {
+          console.log('matchQueue at swipeCity', matchQueue.data, res.data);
+          conductSwipes(matchQueue.data, res.data)
+        })
       })
       .catch((err) => {
         console.log('err at swipeCity', err);
@@ -49,7 +54,11 @@ let getUserProf = (userId) => {
 let getQueue = (userProfile) => {
   console.log('getQueue userProfile:', userProfile);
   return axios.get(`${apiURL}/getQueue/${generator.generateLocation()}/${userProfile['userId']}`) //request queue
+}
 
+let getMatchQueue = (userProfile) => {
+  console.log('getMatchQueue userProfile', userProfile);
+  return axios.get(`${apiURL}/getMatchQueue/${userProfile['userId']}`)
 }
 
 let sendSwipes = (direction, swipingUser, swipedUser) => {

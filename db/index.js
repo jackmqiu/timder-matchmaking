@@ -57,6 +57,14 @@ let deleteQueueList = (userId) => {
   return client.del(`shortQueue:user:${userId}`);
 }
 
+let deleteMatchQueue = (userId) => {
+  return client.del(`matchQueue:user:${userId}`);
+}
+
+let retrieveMatchList = (userId) => {
+  return client.lrangeAsync(`matchQueue:user:${userId}`, 0, -1)
+}
+
 let fillAndRetrieveQueueList = (locationId, userId) => {
   return addQueue(locationId, userId)
   .then((res) => {
@@ -72,7 +80,7 @@ let fillAndRetrieveQueueList = (locationId, userId) => {
 
 let postSwipes = (userId, userId2, direction) => {
   if (direction) {
-    return client.rpushAsync(`shortQueue:user:${userId2}`, `user:${userId}`)
+    return client.rpushAsync(`matchQueue:user:${userId2}`, `user:${userId}`)
     .then((res) => {
       return client.saddAsync(`swipes:user:${userId}`, `user:${userId2}`)
     })
@@ -94,6 +102,8 @@ module.exports = {
   scanLongQueue,
   fillAndRetrieveQueueList,
   deleteQueueList,
+  deleteMatchQueue,
   postSwipes,
-  getUserProfile
+  getUserProfile,
+  retrieveMatchList
 }

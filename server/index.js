@@ -9,18 +9,27 @@ let app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
+app.get('/getMatchQueue/:userId', (req, res) => {
+  db.retrieveMatchList(req.params.userId)
+  .then((matchList) => {
+    console.log('potential matchQueue of app.get', matchList);
+    db.deleteMatchQueue(req.params.userId);
+    res.status(200).send(matchList);
+  })
+});
+
 app.get('/getQueue/:locationId/:userId', (req, res) => {
   console.log('gettingQueueInitial', req.params);
   db.fillAndRetrieveQueueList(req.params.locationId, req.params.userId)
   .then((cursor) => {
     db.deleteQueueList(req.params.userId);
-    console.log('promise of app.get', cursor);
+    console.log('queue of app.get', cursor);
     res.status(200).send(cursor);
   })
   .catch((err) => {
     console.log('err at getQueue server', err);
   })
-})
+});
 
 app.get('/getUser/:userString', (req, res) => {
   console.log('getting User', req.params.userString);
@@ -29,7 +38,7 @@ app.get('/getUser/:userString', (req, res) => {
     console.log('SERVER/INDEX.JS, GETUSERPROFILE.THEN userProfile', userProfile);
     res.status(200).send(userProfile);
   })
-})
+});
 
 app.post('/swipe/:userId/:userId2/:direction', (req, res) => {
   console.log('swipePosting received at server', req.params);
@@ -40,7 +49,7 @@ app.post('/swipe/:userId/:userId2/:direction', (req, res) => {
   .catch((err) => {
     console.log('err at swipe server', err);
   })
-})
+});
 
 const PORT = process.env.PORT || 3000;
 
