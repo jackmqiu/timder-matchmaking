@@ -18,8 +18,8 @@ const basePreference = {
   }
 };
 
-let getDatabaseInfo = () => {
-  return client.infoAsync()
+let getDatabaseInfo = (category) => {
+  return client.infoAsync(category)
 }
 //Set manipulation
 let scanLongQueue = (locationId, userId) => {

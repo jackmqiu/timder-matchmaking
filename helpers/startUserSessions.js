@@ -1,6 +1,8 @@
 const axios = require('axios');
 const generator = require('./generator');
 const apiURL = 'http://localhost:3000';
+const db = require('../db');
+const elastic = require('../elasticSearch');
 //randomomly generate users
 //Users asynchronously
 //loop through users
@@ -9,11 +11,29 @@ const apiURL = 'http://localhost:3000';
 //give each an arbitrary setTimeout for when to logon
 
 let swipeCity = (nPerBatch, timePerBatch, totalUsers, nBatches) => {
+  setInterval(() => {
+    outputToElastic();
+  }, 1000);
   for (var i = 0; i < nBatches; i++) {
     setTimeout(() => {
       swipeBatch(nPerBatch, timePerBatch, totalUsers);
     }, timePerBatch * i);
   }
+}
+
+let outputToElastic = () => {
+  db.getDatabaseInfo('memory')
+  .then((info) => {
+    elastic.indexInfo(info.split('\r\n')[1].split(':'));
+  })
+  db.getDatabaseInfo('cpu')
+  .then((info) => {
+    elastic.indexInfo(info.split('\r\n')[1].split(':'));
+  })
+  db.getDatabaseInfo('stats')
+  .then((info) => {
+    elastic.indexInfo(info.split('\r\n')[2].split(':'));
+  })
 }
 
 let swipeBatch = (nPerBatch, timePerBatch, totalUsers) => {
