@@ -1,7 +1,7 @@
 const config = require('./config.js');
 const redis = require('redis');
 const bluebird = require('bluebird');
-
+const elastic = require('../elasticSearch');
 bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
 
@@ -82,9 +82,10 @@ let fillAndRetrieveQueueList = (locationId, userId) => {
 }
 
 let postSwipes = (userId, userId2, direction, match) => { //add match logic
+  elastic.indexSwipe(userId, userId2, direction);
   if (direction) {
     if (match === 1) {
-
+      elastic.indexMatch(userId, userId2);// pass match to elastic
       client.rpushAsync(`matches:user:${userId}`, `user:${userId2}`) //add matches to both users
       client.rpushAsync(`matches:user:${userId2}`, `user:${userId}`)
       return client.saddAsync(`swipes:user:${userId}`, `user:${userId2}`)

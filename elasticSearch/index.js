@@ -12,7 +12,8 @@ let indexSwipe = (swipingUser, swipedUser, swipeDirection) => {
 
       swipeDirection: swipeDirection,
       swipingUser: swipingUser,
-      swipedUser: swipedUser
+      swipedUser: swipedUser,
+      timeStamp: new Date().toISOString()
 
     }
   }).then(function (resp) {
@@ -28,7 +29,8 @@ let indexMatch = (userId1, userId2) => {
     type: 'matches',
     body: {
       userId1: userId1,
-      userId2: userId2
+      userId2: userId2,
+      timeStamp: new Date().toISOString()
     }
   }).then(function (resp) {
     console.log('put response', resp);
@@ -38,21 +40,23 @@ let indexMatch = (userId1, userId2) => {
 }
 
 let indexInfo = (info) => {
+
   client.index({
     index: 'timder',
     type: 'databaseInfo',
     body: {
-      memoryUsage: info,
-      CPU: info,
-      instantaneous_ops_per_sec: info,
-      instantaneous_input_kbps: info,
-      instantaneous_output_kbps: info,
-      keyspace_hits: info,
-      keyspace_misses: info
+      [`${info[0]}`]: parseInt(info[1]),
+      timeStamp: new Date().toISOString()
     }
   }).then(function (resp) {
     console.log('put response', resp);
   }, function (err) {
     console.trace(err.message);
   });
+}
+
+module.exports = {
+  indexInfo,
+  indexMatch,
+  indexSwipe
 }
