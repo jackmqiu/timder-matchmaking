@@ -65,6 +65,10 @@ let generateNewUserArray = (userId) => {
   newUser.push(userId);
   newUser.push('location');
   newUser.push(generateLocation());
+  newUser.push('photoCount');
+  newUser.push(generatePhotoCount());
+  newUser.push('gender');
+  newUser.push(generateGender());
   newUser.push('preferenceFor0Photos');
   newUser.push(generatePreference());
   newUser.push('preferenceFor1Photos');
@@ -77,10 +81,7 @@ let generateNewUserArray = (userId) => {
   newUser.push(generatePreference());
   // newUser.push('loginBatch');
   // newUser.push(generateLoginBatch());
-  newUser.push('photoCount');
-  newUser.push(generatePhotoCount());
-  newUser.push('gender');
-  newUser.push(generateGender());
+
 
   return newUser;
 }
