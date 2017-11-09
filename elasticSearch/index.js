@@ -26,7 +26,7 @@ let indexSwipe = (swipingUser, swipedUser, swipeDirection) => {
 let indexMatch = (userId1, userId2) => {
   client.index({
     index: 'timder',
-    type: 'matches',
+    type: 'match',
     body: {
       userId1: userId1,
       userId2: userId2,
@@ -56,6 +56,7 @@ let indexInfo = (info) => {
 }
 
 module.exports = {
+  client,
   indexInfo,
   indexMatch,
   indexSwipe
