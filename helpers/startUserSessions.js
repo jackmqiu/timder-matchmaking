@@ -13,7 +13,7 @@ const elastic = require('../elasticSearch');
 let swipeCity = (nPerBatch, timePerBatch, totalUsers, nBatches) => {
   setInterval(() => {
     outputToElastic();
-  }, 1000);
+  }, 100);
   for (var i = 0; i < nBatches; i++) {
     setTimeout(() => {
       swipeBatch(nPerBatch, timePerBatch, totalUsers);
@@ -104,4 +104,5 @@ let conductSwipes = (queue, userProfile, potentialMatches) => {
   }
 }
 
+//add elastic search setup script
 swipeCity(100, 60000, 10000000, 10);
