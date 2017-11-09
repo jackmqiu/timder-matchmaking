@@ -21,17 +21,42 @@ const basePreference = {
 let getDatabaseInfo = (category) => {
   return client.infoAsync(category)
 }
+
+let getRandomUsersFromSet = (userId, photoCount, numberToFetch) => {
+  return client.srandmemberAsync(`longQueue:user:${userId}:photoCount:${photoCount}`, numberToFetch)
+}
 //Set manipulation
 let scanLongQueue = (locationId, userId) => {
   console.log('arguments at scanLongQueue: ', locationId, userId);
-  return client.srandmemberAsync(`longQueue:user:${userId}`, config.queue_size) //returns queue and sscan cursor
+  let queue = [];
+  return getUserProfile('user:' + userId)
+  .then((userProfile) => {
+    console.log('userProfile', userProfile);
+    return Promise.all([
+       getRandomUsersFromSet(userProfile.userId, 0, Math.floor(parseFloat(userProfile.preferenceFor0Photos) * 50)),//returns queue and sscan cursor
+       getRandomUsersFromSet(userProfile.userId, 1, Math.floor(parseFloat(userProfile.preferenceFor1Photos) * 50)),
+       getRandomUsersFromSet(userProfile.userId, 2, Math.floor(parseFloat(userProfile.preferenceFor2Photos) * 50)),
+       getRandomUsersFromSet(userProfile.userId, 3, Math.floor(parseFloat(userProfile.preferenceFor3Photos) * 50)),
+       getRandomUsersFromSet(userProfile.userId, 4, Math.floor(parseFloat(userProfile.preferenceFor4Photos) * 50))
+    ])
+  })
+}
+
+let createSetDifference = (locationId, userId, photoCount) => {
+  return client.sdiffstoreAsync(`longQueue:user:${userId}:photoCount:${photoCount}`, `users:location:${locationId}:photoCount:${photoCount}`, `swipes:user:${userId}`)
 }
 
 let getQueueInitial = (locationId, userId) => {
   console.log('arguments at getQueueInitial for sdiffstoreAsync: ', locationId, userId);
-  return client.sdiffstoreAsync(`longQueue:user:${userId}`, `users:location:${locationId}`, `swipes:user:${userId}`) //make list of all users current user hasn't swiped on in given location
+  return Promise.all([
+    createSetDifference(locationId, userId, 0), //make list of all users current user hasn't swiped on in given location
+    createSetDifference(locationId, userId, 1),
+    createSetDifference(locationId, userId, 2),
+    createSetDifference(locationId, userId, 3),
+    createSetDifference(locationId, userId, 4)
+  ])
   .then((res) => {
-    console.log('response of sdiffstoreAsync', res);
+    console.log('response of promise.all sdiffstoreAsync', res);
     return scanLongQueue(locationId, userId);
   })
   .catch((err) => {
@@ -71,7 +96,14 @@ let retrieveMatchList = (userId) => {
 let fillAndRetrieveQueueList = (locationId, userId) => {
   return addQueue(locationId, userId)
   .then((res) => {
-    return client.lpushAsync(`shortQueue:user:${userId}`, res[1])
+    console.log('array of fillAndRetrieveQueueList', res);
+    return Promise.all([
+      client.lpushAsync(`shortQueue:user:${userId}`, res[0][1]),
+      client.lpushAsync(`shortQueue:user:${userId}`, res[1][1]),
+      client.lpushAsync(`shortQueue:user:${userId}`, res[2][1]),
+      client.lpushAsync(`shortQueue:user:${userId}`, res[3][1]),
+      client.lpushAsync(`shortQueue:user:${userId}`, res[4][1])
+    ])
   })
   .then((res) => {
     return client.lrangeAsync(`shortQueue:user:${userId}`, 0, -1)
