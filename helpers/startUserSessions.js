@@ -3,6 +3,7 @@ const generator = require('./generator');
 const apiURL = 'http://localhost:3000';
 const db = require('../db');
 const elastic = require('../elasticSearch');
+const mappings = require('../elasticSearch/mappings.js')
 //randomomly generate users
 //Users asynchronously
 //loop through users
@@ -104,5 +105,7 @@ let conductSwipes = (queue, userProfile, potentialMatches) => {
   }
 }
 
-//add elastic search setup script
-swipeCity(100, 60000, 10000000, 10);
+mappings.setElasticMappings()//add elastic search setup script
+.then((res) => {
+  swipeCity(100, 60000, 10000000, 10)
+});
